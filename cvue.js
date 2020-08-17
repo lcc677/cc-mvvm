@@ -1,40 +1,51 @@
-class cVue{
-  constructor(options){
-    this.$options = options
-    this.$data = this.$options.data
-    this.observe(this.$data)
-  }
-  observe(data){
-    if(!data || typeof data !== 'object'){
-      return
+class cVue {
+    constructor(options) {
+        this.$option = options
+        this.$data = options.data
+        this.observe(this.$data)
+        new Watcher(this, "foo")
     }
-    Object.keys(data).forEach((val,index) =>{
-      this.defineReactive(data,val,data[val])
-    })
-  }
-  defineReactive(obj, key, val){
-    this.observe(val)
-    Object.defineProperty(obj,key,{
-      get(){
-        console.log("我获取了属性:" + key)
-        return val
-      },
-      set(newVal){
-        val = newVal
-        console.log("我设置了属性"); 
-      }
-    })
-  }
+    observe(data) {
+        if (!data || typeof data !== 'object') return
+        Object.keys(data).forEach(key => {
+            this.defineReactive(data, key, data[key])
+        })
+    }
+    defineReactive(subData, key, val) {
+        this.observe(val)
+        const dep = new Dep()
+        Object.defineProperty(subData, key, {
+            get() {
+                Dep.target && dep.addDep(Dep.target)
+                return val
+            },
+            set(newValue) {
+                val = newValue
+                dep.notify()
+            }
+        })
+    }
 }
-
-const cv = new cVue({
-  data:{
-    name:"Tom",
-    age:{
-      xusui:18,
-      zhousui:19
+// 依赖
+class Dep {
+    constructor() {
+        this.dep = []
     }
-  }
-})
-console.log(cv.$data.name)
-console.log(cv.$data.age.xusui)
+    addDep(dep) {
+        this.dep.push(dep)
+    }
+    notify() {
+        this.dep.forEach(item => item.update())
+    }
+}
+// 监视器
+class Watcher {
+    constructor(vm, key) {
+        this.vm = vm
+        this.key = key
+        Dep.target = this
+    }
+    update() {
+        console.log("我来更新dom树了")
+    }
+}
