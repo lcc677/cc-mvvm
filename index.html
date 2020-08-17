@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+  <div>
+    <span id="name"></span>
+  </div>
+<body>
+  <script>
+    let obj = {}
+    Object.defineProperty(obj,'name',{
+      get(){
+        console.log("我获取了name的值");
+        return document.getElementById('name').innerHTML
+      },
+      set(newValue){
+        console.log("我设置了name的值");
+        document.getElementById('name').innerHTML = newValue
+      }
+    })
+    console.log(obj.name);
+    obj.name="tom"
+    console.log(obj.name);
+  </script>
+</body>
+</html>
